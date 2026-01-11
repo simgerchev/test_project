@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click Counter</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .count-display {
+      background: #f0f0f0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+      border: 2px solid #667eea;
+    }
+
+    .count-label {
+      color: #666;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .count-value {
+      font-size: 48px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .status.success {
+      color: #28a745;
+    }
+
+    .status.error {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>👆 Click Counter</h1>
+    <div class="count-display">
+      <div class="count-label">Total Clicks</div>
+      <div class="count-value" id="count">0</div>
+    </div>
+    <button onclick="incrementClick()">Click Me!</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    // Load initial count from server
+    async function loadCount() {
+      try {
+        const response = await fetch('/api/count');
+        const data = await response.json();
+        document.getElementById('count').textContent = data.count;
+      } catch (error) {
+        console.error('Error loading count:', error);
+        showStatus('Error loading count', 'error');
+      }
+    }
+
+    // Send click to server
+    async function incrementClick() {
+      try {
+        const response = await fetch('/api/click', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await response.json();
+        document.getElementById('count').textContent = data.count;
+        showStatus('Saved to count.txt!', 'success');
+      } catch (error) {
+        console.error('Error incrementing count:', error);
+        showStatus('Error saving click', 'error');
+      }
+    }
+
+    function showStatus(message, type) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      setTimeout(() => {
+        statusEl.textContent = '';
+        statusEl.className = 'status';
+      }, 2000);
+    }
+
+    // Load count when page loads
+    loadCount();
+  </script>
+</body>
+</html>
