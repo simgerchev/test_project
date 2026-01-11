@@ -1,12 +1,14 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
 const COUNT_FILE = path.join(__dirname, 'count.txt');
 
 // Middleware
+app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
 
